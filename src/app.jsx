@@ -1,27 +1,29 @@
 //import React from 'react';
 import { useEffect, useState } from 'react';
-import './app.css';
+import styles from './app.module.css';
+import SearchHeader from './components/search_header/search_header';
 import VideoList from './components/video_list/video_list';
 
-function App() {
+function App({youtube}) {
   const [videos, setVideos] = useState([]);
+  const search = query =>{
+    youtube
+      .search(query)
+      .then(videos => setVideos(videos));
+  };
 
   useEffect(()=>{
-    var requestOptions = {
-      method: 'GET',
-      redirect: 'follow'
-    };
-    
-    fetch("https://youtube.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&maxResults=25&key=AIzaSyBu8Ybq4j_Ju38xXD3ZnmFpc8o_BAcmhbQ", requestOptions)
-      .then(response => response.json())
-      .then(result => setVideos(result.items))
-      .catch(error => console.log('error', error));
-  } , []); // useEffect에서 저렇게 두번째 인자값으로 빈 배열을 입력하면
-           // 마운트가 되었을 때만 useEffect가 호출된다.
-
+    youtube
+      .mostPopular()
+      .then(videos => setVideos(videos));
+  },[]);
   
-  return <VideoList videos = {videos}/>
-
+  return (
+    <div className ={styles.app}>
+      <SearchHeader onSearch={search}/>
+      <VideoList videos = {videos}/>
+    </div>
+  );
 }
 
 export default App;
